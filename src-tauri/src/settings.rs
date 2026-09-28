@@ -11,6 +11,8 @@ pub struct Settings {
     pub notifications: bool,
     /// Display zoom for the WhatsApp webview, 1.0 = the site's own sizing.
     pub zoom: f64,
+    /// What to open on launch: "dashboard" (default), "acct:<id>", or "all".
+    pub startup_view: String,
 }
 
 impl Default for Settings {
@@ -23,6 +25,7 @@ impl Default for Settings {
             hotkey: "CmdOrCtrl+Shift+W".to_string(),
             notifications: true,
             zoom: 1.0,
+            startup_view: "dashboard".to_string(),
         }
     }
 }
@@ -225,6 +228,7 @@ mod tests {
         assert_eq!(s.hotkey, "CmdOrCtrl+Shift+W");
         assert!(!s.autostart);
         assert_eq!(s.zoom, 1.0);
+        assert_eq!(s.startup_view, "dashboard");
     }
 
     #[test]

@@ -61,6 +61,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
                 return;
             }
             match id {
+                "dashboard" => crate::window::open_dashboard_window(app),
                 "accounts" | "settings" => crate::window::open_settings_window(app),
                 "reload" => {
                     if let Some(active) = app.try_state::<crate::accounts::ActiveAccount>() {
@@ -91,7 +92,7 @@ pub fn setup(app: &AppHandle) -> tauri::Result<()> {
 }
 
 /// Rebuild the tray menu from the current accounts list: one `acct:<id>` item per
-/// account showing `name (n)`, then the static `Accounts… / Settings / Reload / [Lock now] / Quit`.
+/// account showing `name (n)`, then the static `Dashboard / Accounts… / Settings / Reload / [Lock now] / Quit`.
 pub fn rebuild_menu(app: &AppHandle) {
     let Some(tray) = app.tray_by_id("main-tray") else {
         return;
@@ -127,6 +128,9 @@ pub fn rebuild_menu(app: &AppHandle) {
         builder = builder.item(&item);
     }
 
+    let Ok(dashboard_item) = MenuItemBuilder::with_id("dashboard", "Dashboard").build(app) else {
+        return;
+    };
     let Ok(accounts_item) = MenuItemBuilder::with_id("accounts", "Accounts\u{2026}").build(app)
     else {
         return;
@@ -143,6 +147,7 @@ pub fn rebuild_menu(app: &AppHandle) {
 
     let mut tail = builder
         .separator()
+        .item(&dashboard_item)
         .item(&accounts_item)
         .item(&settings)
         .item(&reload);

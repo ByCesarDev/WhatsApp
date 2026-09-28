@@ -11,6 +11,36 @@ function selectNearestZoom(value) {
   sel.value = [...sel.options].reduce((a, b) => (distance(b) < distance(a) ? b : a)).value;
 }
 
+function populateStartupViewOptions(accounts, selectedValue) {
+  const sel = document.getElementById("startup_view");
+  if (!sel) return;
+  sel.innerHTML = "";
+
+  const defaultOpt = document.createElement("option");
+  defaultOpt.value = "dashboard";
+  defaultOpt.textContent = "Dashboard (Selector de cuentas)";
+  sel.appendChild(defaultOpt);
+
+  if (Array.isArray(accounts)) {
+    for (const a of accounts) {
+      const opt = document.createElement("option");
+      opt.value = `acct:${a.id}`;
+      opt.textContent = `Cuenta: ${a.name}`;
+      sel.appendChild(opt);
+    }
+    if (accounts.length > 1) {
+      const allOpt = document.createElement("option");
+      allOpt.value = "all";
+      allOpt.textContent = "Todas las cuentas (ventanas separadas)";
+      sel.appendChild(allOpt);
+    }
+  }
+
+  if (selectedValue) {
+    sel.value = selectedValue;
+  }
+}
+
 async function load() {
   const s = await invoke("get_settings");
   for (const f of BOOLS) {
@@ -19,6 +49,13 @@ async function load() {
   }
   document.getElementById("hotkey").value = s.hotkey || "CmdOrCtrl+Shift+W";
   selectNearestZoom(Number.isFinite(s.zoom) ? s.zoom : ZOOM_DEFAULT);
+
+  try {
+    const accounts = await invoke("list_accounts");
+    populateStartupViewOptions(accounts, s.startup_view || "dashboard");
+  } catch (e) {
+    populateStartupViewOptions([], s.startup_view || "dashboard");
+  }
 }
 
 async function save() {
@@ -30,6 +67,10 @@ async function save() {
   const hk = document.getElementById("hotkey").value.trim();
   s.hotkey = hk || "CmdOrCtrl+Shift+W";
   s.zoom = parseFloat(document.getElementById("zoom").value) || ZOOM_DEFAULT;
+  const startupEl = document.getElementById("startup_view");
+  if (startupEl) {
+    s.startup_view = startupEl.value || "dashboard";
+  }
   const note = document.getElementById("note");
   try {
     const warn = await invoke("set_settings", { settings: s });
@@ -124,6 +165,9 @@ async function loadAccounts() {
   try {
     const accounts = await invoke("list_accounts");
     renderAccounts(accounts);
+    const sel = document.getElementById("startup_view");
+    const current = sel ? sel.value : "dashboard";
+    populateStartupViewOptions(accounts, current);
   } catch (e) {
     // ignore — listing failed
   }
@@ -153,21 +197,27 @@ async function addAccount() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+function init() {
   load();
   loadAccounts();
   loadLock();
   wireLock();
-  document.getElementById("save").addEventListener("click", save);
-  document.getElementById("add_account").addEventListener("click", addAccount);
-  document.getElementById("new_account_name").addEventListener("keydown", (e) => {
+  document.getElementById("save")?.addEventListener("click", save);
+  document.getElementById("add_account")?.addEventListener("click", addAccount);
+  document.getElementById("new_account_name")?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") addAccount();
   });
-  document.getElementById("record_hotkey").addEventListener("click", toggleRecording);
+  document.getElementById("record_hotkey")?.addEventListener("click", toggleRecording);
   // Zoom saves on change rather than on Save: picking a size you cannot see the
   // effect of is guesswork, and the webview applies it immediately.
-  document.getElementById("zoom").addEventListener("change", save);
-});
+  document.getElementById("zoom")?.addEventListener("change", save);
+}
+
+if (document.readyState === "loading") {
+  window.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
+}
 
 // --- App lock ---
 

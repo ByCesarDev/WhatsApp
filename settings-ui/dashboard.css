@@ -1,0 +1,247 @@
+/* Dashboard layout & aesthetics */
+:root {
+  --wa-green: #25d366;
+  --wa-green-hover: #1ebd5a;
+  --bg-dark: #111b21;
+  --bg-card: #202c33;
+  --bg-card-hover: #2a3942;
+  --border-color: #2a3942;
+  --text-main: #e9edef;
+  --text-muted: #8696a0;
+  --badge-bg: #25d366;
+  --badge-text: #111b21;
+  --radius: 12px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px 28px;
+  max-width: 520px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Header */
+.dash-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.dash-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.dash-logo {
+  width: 32px;
+  height: 32px;
+  stroke: var(--wa-green);
+  filter: drop-shadow(0 2px 8px rgba(37, 211, 102, 0.4));
+}
+
+.dash-logo-row h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.dash-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* Main content */
+.dash-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Accounts Grid / List */
+.accounts-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.accounts-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.accounts-grid::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+/* Account Card */
+.account-card {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  text-align: left;
+}
+
+.account-card:hover {
+  background-color: var(--bg-card-hover);
+  border-color: #3b4a54;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.account-card:active {
+  transform: translateY(0);
+}
+
+/* Account Avatar */
+.account-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin-right: 14px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Account Details */
+.account-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Unread Badge */
+.account-badge {
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 12px;
+  margin-left: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3);
+}
+
+/* Add account section */
+.dash-add-section {
+  margin-top: 4px;
+}
+
+.add-card-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-card-btn:hover {
+  border-color: var(--wa-green);
+  color: var(--wa-green);
+  background: rgba(37, 211, 102, 0.05);
+}
+
+.add-card-btn .plus-icon {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Footer */
+.dash-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.footer-btn:hover {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border-color: #3b4a54;
+}
+
+.footer-btn.secondary:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}

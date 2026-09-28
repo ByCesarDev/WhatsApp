@@ -980,8 +980,8 @@ pub fn show_account(app: &AppHandle, label: &str) {
     }
 }
 
-/// Show the active (last-focused) account window. Falls back to the first existing
-/// account window, then the settings window.
+/// Show the active (last-focused) account window. Falls back to any visible account,
+/// then the dashboard / startup view.
 pub fn show_active(app: &AppHandle) {
     // If the app is locked, any "reveal" request shows the lock screen, never an
     // account window. Covers tray click, global shortcut, single-instance, macOS Reopen.
@@ -989,32 +989,35 @@ pub fn show_active(app: &AppHandle) {
         crate::lock::show_lock_window(app);
         return;
     }
+    if let Some(w) = app.get_webview_window("dashboard") {
+        if w.is_visible().unwrap_or(false) {
+            let _ = w.unminimize();
+            let _ = w.set_focus();
+            return;
+        }
+    }
     if let Some(active) = app.try_state::<ActiveAccount>() {
         let label = active.lock().unwrap().clone();
-        if app.get_webview_window(&label).is_some() {
+        if let Some(w) = app.get_webview_window(&label) {
+            if w.is_visible().unwrap_or(false) {
+                show_account(app, &label);
+                return;
+            }
+        }
+    }
+    // Fall back to any currently visible account window.
+    for (label, w) in app.webview_windows() {
+        if label.starts_with("wa-") && w.is_visible().unwrap_or(false) {
             show_account(app, &label);
             return;
         }
     }
-    // Fall back to any account window.
-    if let Some(label) = app
-        .webview_windows()
-        .keys()
-        .find(|l| l.starts_with("wa-"))
-        .cloned()
-    {
-        show_account(app, &label);
-        return;
-    }
-    // Last resort: the settings window.
-    if let Some(w) = app.get_webview_window("settings") {
-        let _ = w.show();
-        let _ = w.set_focus();
-    }
+    // If nothing is visible, open the startup view (dashboard by default).
+    show_startup_view(app);
 }
 
 /// Backwards-compatible shim: single-instance + macOS Reopen call this; it now
-/// targets the active account.
+/// targets the active account or dashboard.
 pub fn show_main(app: &AppHandle) {
     show_active(app);
 }
@@ -1061,17 +1064,78 @@ pub fn toggle_active(app: &AppHandle) {
     }
 }
 
-/// Opens (or focuses) the local settings window.
-pub fn open_settings_window(app: &AppHandle) {
-    if let Some(w) = app.get_webview_window("settings") {
+/// Opens (or focuses) the local dashboard / account selector window.
+pub fn open_dashboard_window(app: &AppHandle) {
+    if !crate::lock::is_unlocked(app) {
+        crate::lock::show_lock_window(app);
+        return;
+    }
+    if let Some(w) = app.get_webview_window("dashboard") {
         let _ = w.show();
+        let _ = w.unminimize();
         let _ = w.set_focus();
         return;
     }
+    let icon = tauri::image::Image::from_bytes(APP_ICON).expect("valid app icon");
+    let _ = WebviewWindowBuilder::new(app, "dashboard", WebviewUrl::App("dashboard.html".into()))
+        .title("whatRust")
+        .inner_size(520.0, 620.0)
+        .min_inner_size(460.0, 520.0)
+        .resizable(false)
+        .icon(icon)
+        .expect("valid icon")
+        .center()
+        .build();
+}
+
+/// Decides which view/window to display according to the user's startup_view setting.
+pub fn show_startup_view(app: &AppHandle) {
+    if !crate::lock::is_unlocked(app) {
+        crate::lock::show_lock_window(app);
+        return;
+    }
+    let s = crate::settings::load(app);
+    let view = s.startup_view.as_str();
+
+    if view == "dashboard" || view.is_empty() {
+        open_dashboard_window(app);
+    } else if let Some(acct_id) = view.strip_prefix("acct:") {
+        let label = accounts::window_label(acct_id);
+        if app.get_webview_window(&label).is_some() {
+            show_account(app, &label);
+        } else {
+            open_dashboard_window(app);
+        }
+    } else if view == "all" {
+        for a in accounts::load(app).accounts {
+            show_account(app, &accounts::window_label(&a.id));
+        }
+    } else {
+        open_dashboard_window(app);
+    }
+}
+
+/// Opens (or focuses) the local settings window.
+pub fn open_settings_window(app: &AppHandle) {
+    if !crate::lock::is_unlocked(app) {
+        crate::lock::show_lock_window(app);
+        return;
+    }
+    if let Some(w) = app.get_webview_window("settings") {
+        let _ = w.show();
+        let _ = w.unminimize();
+        let _ = w.set_focus();
+        return;
+    }
+    let icon = tauri::image::Image::from_bytes(APP_ICON).expect("valid app icon");
     let _ = WebviewWindowBuilder::new(app, "settings", WebviewUrl::App("index.html".into()))
         .title("whatRust — Settings")
-        .inner_size(440.0, 680.0)
+        .inner_size(460.0, 700.0)
+        .min_inner_size(400.0, 500.0)
         .resizable(false)
+        .icon(icon)
+        .expect("valid icon")
+        .center()
         .build();
 }
 

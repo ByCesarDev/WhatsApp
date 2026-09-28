@@ -18,9 +18,9 @@ impl LockState {
 }
 
 /// Whether a window label should be hidden behind the lock screen. Pure, unit-tested.
-/// The lock window itself is never hidden; everything user-facing (`wa-*` + settings) is.
+/// The lock window itself is never hidden; everything user-facing (`wa-*`, settings, dashboard) is.
 pub fn should_hide(label: &str) -> bool {
-    label != "lock" && (label.starts_with("wa-") || label == "settings")
+    label != "lock" && (label.starts_with("wa-") || label == "settings" || label == "dashboard")
 }
 
 /// Pure predicate behind the lock-window IPC guard.
@@ -75,7 +75,7 @@ pub fn lock_now(app: &AppHandle) {
 }
 
 /// Unlock the app: mark unlocked, destroy the lock window, and restore the windows
-/// that were visible when we locked (or fall back to the active account).
+/// that were visible when we locked (or fall back to the active account / dashboard).
 pub fn unlock(app: &AppHandle) {
     let state = match app.try_state::<LockState>() {
         Some(s) => s,
@@ -90,7 +90,13 @@ pub fn unlock(app: &AppHandle) {
         crate::window::show_active(app);
     } else {
         for label in hidden {
-            crate::window::show_account(app, &label);
+            if label == "dashboard" {
+                crate::window::open_dashboard_window(app);
+            } else if label == "settings" {
+                crate::window::open_settings_window(app);
+            } else {
+                crate::window::show_account(app, &label);
+            }
         }
     }
 }
@@ -136,6 +142,7 @@ mod tests {
         assert!(should_hide("wa-default"));
         assert!(should_hide("wa-acct-3"));
         assert!(should_hide("settings"));
+        assert!(should_hide("dashboard"));
     }
 
     #[test]

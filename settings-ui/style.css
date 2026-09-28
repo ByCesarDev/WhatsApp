@@ -1,81 +1,273 @@
 :root {
   color-scheme: light dark;
   --green: #25d366;
+  --green-hover: #1ebd5a;
+  --bg-dark: #111b21;
+  --bg-card: #202c33;
+  --bg-card-hover: #2a3942;
+  --border-color: #2a3942;
+  --text-main: #e9edef;
+  --text-muted: #8696a0;
 }
-* { box-sizing: border-box; }
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   margin: 0;
-  padding: 20px 22px;
+  padding: 22px 24px;
   font-size: 14px;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  user-select: none;
+  -webkit-user-select: none;
 }
-h1 { font-size: 17px; margin: 0 0 16px; }
-.row { display: flex; align-items: center; gap: 10px; padding: 8px 0; cursor: pointer; }
-.row input { width: 16px; height: 16px; accent-color: var(--green); }
-.field { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
-.field input, .field select {
-  padding: 8px 10px; border: 1px solid #8884; border-radius: 8px;
-  background: transparent; color: inherit; font-size: 13px;
+
+h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 18px;
+  color: var(--text-main);
 }
-/* A native popup button carries its own fixed control metrics and ignores most
-   of the padding above, so it renders shorter than the text fields beside it.
-   Drop the native appearance and draw the chevron ourselves; the select then
-   uses the same box as every input in this pane. */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 14px 0;
+  color: var(--text-main);
+}
+
+.field input,
 .field select {
-  appearance: none; -webkit-appearance: none;
-  line-height: normal; padding-right: 30px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--green);
+}
+
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: normal;
+  padding-right: 32px;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238696a0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 12px center;
+  cursor: pointer;
 }
-.actions { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 button {
-  background: var(--green); color: #042f1a; border: 0; border-radius: 8px;
-  padding: 9px 18px; font-weight: 600; font-size: 14px; cursor: pointer;
+  background: var(--green);
+  color: #111b21;
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: filter 0.2s ease, background-color 0.2s ease;
 }
-button:hover { filter: brightness(1.05); }
-button.secondary { background: transparent; color: inherit; border: 1px solid #8886; }
-button.secondary:hover { filter: none; background: #8881; }
-.note { color: var(--green); font-weight: 600; }
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+button.secondary:hover {
+  background: var(--bg-card);
+  border-color: #3b4a54;
+}
+
+.note {
+  color: var(--green);
+  font-weight: 600;
+}
 
 /* --- Accounts manager --- */
-h2 { font-size: 14px; margin: 0 0 10px; font-weight: 600; }
-.section-title { margin-top: 22px; }
-.divider { border: 0; border-top: 1px solid #8883; margin: 18px 0; }
-#accounts-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+h2 {
+  font-size: 15px;
+  margin: 0 0 12px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.section-title {
+  margin-top: 24px;
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid var(--border-color);
+  margin: 20px 0;
+}
+
+#accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .account-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border: 1px solid #8884; border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  border-radius: 8px;
 }
-.account-row .acct-name { flex: 1 1 auto; font-size: 13px; }
+
+.account-row .acct-name {
+  flex: 1 1 auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
 .account-row .acct-unread {
-  min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px;
-  background: var(--green); color: #042f1a; font-size: 11px; font-weight: 700;
-  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--green);
+  color: #111b21;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
+
 .account-row button {
-  padding: 5px 10px; font-size: 12px; font-weight: 600;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
 }
-.account-row button.secondary {
-  background: transparent; color: inherit; border: 1px solid #8886;
+
+.account-row button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
-.account-row button.secondary:hover { filter: none; background: #8881; }
-.account-row button:disabled { opacity: 0.4; cursor: not-allowed; }
-.add-row { display: flex; gap: 8px; }
+
+.add-row {
+  display: flex;
+  gap: 8px;
+}
+
 .add-row input {
-  flex: 1 1 auto; padding: 8px 10px; border: 1px solid #8884; border-radius: 8px;
-  background: transparent; color: inherit; font-size: 13px;
+  flex: 1 1 auto;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  font-size: 13px;
+  outline: none;
 }
-.add-row button:disabled { opacity: 0.4; cursor: not-allowed; }
-.macos-note { color: #c0392b; font-size: 12px; margin: 8px 0 0; }
-.macos-note[hidden] { display: none; }
-.lock-note { font-size: 12px; color: #8696a0; margin-top: 10px; line-height: 1.4; }
-#lock-enabled .field input[type="number"] { width: 80px; }
 
-.hotkey-row { display: flex; gap: 8px; align-items: center; }
-.hotkey-row #hotkey { flex: 1; min-width: 0; }
-#record_hotkey.recording { background: #f0a500; color: #1a1a1a; }
-.hotkey-hint { font-size: 12px; color: #f0a500; margin: 4px 0 0; }
+.add-row input:focus {
+  border-color: var(--green);
+}
 
-.field-note { font-size: 12px; color: #8696a0; margin: 4px 0 0; line-height: 1.4; }
-.field-note code { background: #8882; padding: 1px 5px; border-radius: 4px; font-size: 11px; }
+.add-row button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.macos-note {
+  color: #ef4444;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+
+.macos-note[hidden] {
+  display: none;
+}
+
+.lock-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 12px;
+  line-height: 1.4;
+}
+
+#lock-enabled .field input[type="number"] {
+  width: 90px;
+}
+
+.hotkey-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.hotkey-row #hotkey {
+  flex: 1;
+  min-width: 0;
+}
+
+#record_hotkey.recording {
+  background: #f59e0b;
+  color: #111b21;
+}
+
+.hotkey-hint {
+  font-size: 12px;
+  color: #f59e0b;
+  margin: 4px 0 0;
+}
+
+.field-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+.field-note code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}

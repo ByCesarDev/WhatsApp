@@ -102,6 +102,7 @@ pub fn run() {
             commands::get_settings,
             commands::set_settings,
             commands::open_settings,
+            commands::open_dashboard,
             commands::list_accounts,
             commands::add_account,
             commands::remove_account,
@@ -155,11 +156,10 @@ pub fn run() {
             let lock_cfg = applock::load(handle);
             let lock_on_launch = lock_cfg.is_active() && lock_cfg.lock_on_launch;
             handle.manage(lock::LockState::new(!lock_on_launch));
-            let open_hidden = start_hidden || lock_on_launch;
 
-            // Open every account window so each one receives messages/notifications.
+            // Open every account window in background (hidden) so each one receives messages/notifications.
             for a in &f.accounts {
-                window::open_account_window(handle, a, open_hidden)?;
+                window::open_account_window(handle, a, true)?;
             }
 
             tray::setup(handle)?;
@@ -168,6 +168,8 @@ pub fn run() {
 
             if lock_on_launch && !start_hidden {
                 lock::show_lock_window(handle);
+            } else if !start_hidden {
+                window::show_startup_view(handle);
             }
 
             // Idle auto-lock watcher. Always running; no-op unless the lock is active

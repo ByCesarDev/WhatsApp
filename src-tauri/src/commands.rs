@@ -123,6 +123,16 @@ pub fn open_settings(window: tauri::Window, app: tauri::AppHandle) -> Result<(),
     Ok(())
 }
 
+#[tauri::command]
+pub fn open_dashboard(window: tauri::Window, app: tauri::AppHandle) -> Result<(), String> {
+    if is_remote(&window) {
+        return Err("forbidden".into());
+    }
+    lock::require_unlocked(&app)?;
+    crate::window::open_dashboard_window(&app);
+    Ok(())
+}
+
 // ---------------------------------------------------------------------------
 // Account-management commands (local-only).
 // ---------------------------------------------------------------------------
